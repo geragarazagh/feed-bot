@@ -1,0 +1,48 @@
+[Unit]
+Description=Feed (@FeedChannelsBot): new posts of public Telegram channels as links with previews
+Documentation=file:///opt/feedbot/src/README.md
+Wants=network-online.target
+After=network-online.target
+# Never give up restarting: the network or Telegram may be away for a while.
+StartLimitIntervalSec=0
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=feedbot
+Group=feedbot
+ExecStart=/opt/feedbot/venv/bin/feedbot
+Environment=TGFEED_CONFIG=/etc/feedbot/config.json PYTHONUNBUFFERED=1
+# The bot token is decrypted by systemd (host key + TPM) and handed over in $CREDENTIALS_DIRECTORY.
+LoadCredentialEncrypted=token:/etc/feedbot/token.cred
+StateDirectory=feedbot
+StateDirectoryMode=0700
+Restart=always
+RestartSec=10
+TimeoutStartSec=120
+# The process pings the watchdog only while updates arrive and polling rounds go on.
+WatchdogSec=300
+MemoryMax=300M
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

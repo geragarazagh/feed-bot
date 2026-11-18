@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
+<!-- Feed (@FeedChannelsBot) avatar, direction A «stack of posts»: the static avatar and the rest frame of the
+     animated one (render_a.py). Telegram logo gradient #2AABEE -> #229ED9 (press-kit Logo.svg); back card 240 x 210
+     at 0.55 opacity showing 52 px above the front card 300 x 210, radius 36, glyph centred; forward arrow:
+     Telegram Web A share-filled.svg (github.com/Ajaxy/telegram-tt, src/assets/font-icons), scale 5.8.
+     Claude (Opus 5.5), 2026-11-18. -->
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2AABEE"/><stop offset="1" stop-color="#229ED9"/></linearGradient></defs>
+<rect width="640" height="640" fill="url(#bg)"/>
+<rect x="200" y="189" width="240" height="210" rx="36" fill="#FFFFFF" fill-opacity="0.55"/>
+<rect x="170" y="241" width="300" height="210" rx="36" fill="#FFFFFF"/>
+<path transform="translate(224.387 252.939) scale(5.8)" fill="#229ED9" d="M16.403 6.394A1.422 1.422 0 0 1 18.79 5.35l10.395 9.606c.577.533.612 1.433.061 2.029l-.061.06-10.395 9.606a1.422 1.422 0 0 1-2.388-1.044v-4.398c-5.363.129-9.026 1.841-11.064 5.103l-.195.324a.969.969 0 0 1-1.808-.47c-.138-9.741 4.129-14.936 12.638-15.34l.429-.016V6.394z"/>
+</svg>
