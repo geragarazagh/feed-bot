@@ -202,9 +202,19 @@ T: dict[str, dict[str, str]] = {
         "uk": "Ваш список порожній.",
     },
     "found": {
-        "en": "Channels found: {n}. Selected: {k}.",
-        "ru": "Найдено каналов: {n}. Выбрано: {k}.",
-        "uk": "Знайдено каналів: {n}. Вибрано: {k}.",
+        "en": "Channels found: {n}. Selected: {k}. Room left: {r}.",
+        "ru": "Найдено каналов: {n}. Выбрано: {k}. Можно добавить ещё: {r}.",
+        "uk": "Знайдено каналів: {n}. Вибрано: {k}. Можна додати ще: {r}.",
+    },
+    "too_many": {
+        "en": "Selected {k}, but only {r} more fit. Untick {x}.",
+        "ru": "Выбрано {k}, а поместится ещё {r}. Снимите галочки с {x}.",
+        "uk": "Вибрано {k}, а вміститься ще {r}. Зніміть позначки з {x}.",
+    },
+    "checked_first": {
+        "en": "The first {n} were checked; {k} more were not.",
+        "ru": "Проверены первые {n}, ещё {k} не проверены.",
+        "uk": "Перевірено перші {n}, ще {k} не перевірено.",
     },
     "not_checked": {
         "en": "{n} more were not checked.",

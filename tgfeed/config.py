@@ -20,7 +20,7 @@ class Config:
     # Limits. `max_channels` caps distinct channels across all users so polling fits the free
     # 1 GB of egress a month (arithmetic in the README); past it new channels wait in a queue.
     max_channels: int = 100
-    max_subs_per_user: int = 30
+    max_subs_per_user: int = 50
     max_adds_per_hour: int = 60  # channel checks an hour: two full lists of 30
     # On a host with IPv6 but no IPv4 route to the internet (the free VM), connect over IPv6 only,
     # so no connection waits on an IPv4 attempt that can never succeed.

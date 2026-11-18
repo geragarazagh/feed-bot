@@ -24,6 +24,7 @@ REQUEST_CHANNEL = 1  # request_id of the "Choose a Channel" button
 NO_PREVIEW = {"is_disabled": True}
 COMMANDS = ("add", "channels", "settings", "help")
 RATE = object()  # _check's "too many checks this hour"
+LIST_MAX = 50  # channels checked from one list: the checklist stays under Telegram's 100 buttons
 
 
 def choose_keyboard(lang: str) -> dict:
@@ -305,18 +306,17 @@ class Bot:
             await asyncio.sleep(4)
 
     async def add_many(self, chat: int, user: User, names: list[str], lines: list[str]) -> None:
-        """Read every channel of a list (at most as many as still fit), then show one checklist message:
-        a button per channel, all ticked; a tap toggles; Done adds the ticked ones."""
-        room = self.cfg.max_subs_per_user - len(self.store.subs_of(user.id))
+        """Read every channel of a list (up to LIST_MAX), then show one checklist message: a button per readable
+        channel, the first ones ticked as far as the user's room allows; a tap toggles; Done adds the ticked ones."""
+        room = self._room(user)
         found: dict[str, str] = {}
         pages: dict = {}
-        skipped = 0
+        if len(names) > LIST_MAX:
+            lines.insert(0, t("checked_first", user.lang, n=LIST_MAX, k=len(names) - LIST_MAX))
+            names = names[:LIST_MAX]
         typing = asyncio.create_task(self._typing(chat))
         try:
             for i, username in enumerate(names):
-                if len(found) >= room:
-                    skipped = len(names) - i
-                    break
                 ch, why = await self._check(user, username)
                 if why is RATE:
                     lines.insert(0, t("limit_rate", user.lang, n=self.cfg.max_adds_per_hour) + " " +
@@ -329,17 +329,18 @@ class Bot:
                 pages[username] = ch
         finally:
             typing.cancel()
-        if skipped:
-            lines.insert(0, t("room", user.lang, n=self.cfg.max_subs_per_user, k=skipped))
         if not found:
             await self.say(chat, "\n".join(lines) or t("channels_empty", user.lang))
             return
-        basket = {"items": found, "ticked": set(found), "notes": lines, "pages": pages}
+        basket = {"items": found, "ticked": set(list(found)[:max(room, 0)]), "notes": lines, "pages": pages}
         msg = await self.say(chat, self._basket_text(user, basket), reply_markup=self._basket_markup(user, basket))
         self._baskets[(user.id, msg["message_id"])] = basket
 
+    def _room(self, user: User) -> int:
+        return self.cfg.max_subs_per_user - len(self.store.subs_of(user.id))
+
     def _basket_text(self, user: User, basket: dict) -> str:
-        head = t("found", user.lang, n=len(basket["items"]), k=len(basket["ticked"]))
+        head = t("found", user.lang, n=len(basket["items"]), k=len(basket["ticked"]), r=max(self._room(user), 0))
         return "\n\n".join([head] + (["\n".join(basket["notes"])] if basket["notes"] else []))
 
     def _basket_markup(self, user: User, basket: dict) -> dict:
@@ -452,6 +453,9 @@ class Bot:
             elif data == "X":
                 self._baskets.pop((user.id, mid), None)
                 await self.api.call("deleteMessage", chat_id=chat, message_id=mid)
+            elif data == "K" and len(basket["ticked"]) > self._room(user):
+                room = max(self._room(user), 0)
+                toast = t("too_many", user.lang, k=len(basket["ticked"]), r=room, x=len(basket["ticked"]) - room)
             elif data == "K":
                 self._baskets.pop((user.id, mid), None)
                 text = await self._basket_done(user, basket)

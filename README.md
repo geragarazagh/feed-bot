@@ -14,7 +14,7 @@ its comments. The channels need not be joined, and the bot reads them without a 
 |---|---|
 | Platform | Telegram, any client |
 | Languages | English, Russian, Ukrainian (follows the Telegram app; changeable in Settings) |
-| Limits | 30 channels per user; 60 channel checks per hour per user; 100 distinct channels for all users of this instance |
+| Limits | 50 channels per user; 60 channel checks per hour per user; 100 distinct channels for all users of this instance |
 | Stored | Telegram user ID, language, two flags, channel usernames ([PRIVACY.md](PRIVACY.md)) |
 | Server | Python 3.11+, one dependency (`httpx`), about 40 MB of memory |
 | License | MIT |
@@ -25,8 +25,8 @@ its comments. The channels need not be joined, and the bot reads them without a 
   A channel can also be added by its `@username`, a `t.me` link, or any forwarded post. One channel is added at once:
   the bot answers with the channel's latest post as a card and one line. A message with several channels, or posts
   from several channels forwarded together, opens a checklist instead: one button per channel, all ticked; a tap
-  toggles a channel, *Done* adds the ticked ones. A pasted list longer than the room left (30 per user) is checked
-  in order until the room is filled, and the rest is reported as not checked.
+  toggles a channel, *Done* adds the ticked ones. Up to 50 channels of a list are checked and all readable ones are shown; as many are ticked as still fit (50 per user), and *Done* refuses a selection larger than the room left. A pasted list longer than 50 is checked
+  only in its first 50, and the rest is reported as not checked.
 - `/channels` lists the channels, each with *Pause*/*Resume* and *Remove*.
 - `/settings`: *Notifications* (off: posts arrive without sound) and *Language*.
 - `/help`; `/stop` deletes the user's record after a confirmation, as does blocking the bot.

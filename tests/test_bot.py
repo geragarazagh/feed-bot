@@ -123,24 +123,31 @@ class BotTest(unittest.IsolatedAsyncioTestCase):
         self.assertIn("not from a channel", sent[0]["text"])
 
     async def test_pasted_list_of_100(self):
+        self.bot.cfg = Config(bot_token="x", state_dir=self.cfg.state_dir)  # default limits: 50 a user, 100 in all
+        self.store.touch_user(ME, "en")
+        for i in range(20):  # 20 already in the list: room for 30 more of 50
+            self.store.add_channel(f"have{i:02d}", 1, 1, 300, queued=False)
+            self.store.subscribe(ME, f"have{i:02d}", 1)
         names = " ".join(f"@chan{i:03d}" for i in range(100))
         await self.bot.on_message(self.msg(names, lang="en"))
         sent = self.api.sent()
         self.assertEqual(len(sent), 1)  # one reply: the checklist
         rows = sent[0]["reply_markup"]["inline_keyboard"]
-        self.assertEqual(len(rows), 31)  # 30 channels and the Cancel/Done row
+        self.assertEqual(len(rows), 51)  # all 50 checked channels and the Cancel/Done row
         self.assertEqual(rows[0][0]["text"], "✓ Title chan000")
+        self.assertEqual(rows[30][0]["text"], "Title chan030")  # only as many ticked as fit
         self.assertEqual([b["text"] for b in rows[-1]], ["Cancel", "Done"])
-        self.assertIn("Channels found: 30. Selected: 30.", sent[0]["text"])
-        self.assertIn("A list holds up to 30 channels, so 70 more were not checked.", sent[0]["text"])
+        self.assertIn("Channels found: 50. Selected: 30. Room left: 30.", sent[0]["text"])
+        self.assertIn("The first 50 were checked; 50 more were not.", sent[0]["text"])
         mid = next(iter(self.bot._baskets))[1]
         q = {"id": "q", "from": {"id": ME, "language_code": "en"}, "message": {"chat": {"id": ME}, "message_id": mid}}
-        await self.bot.on_button({**q, "data": "k:chan001"})  # untick one
-        edits = [p for m, p in self.api.calls if m == "editMessageText"]
-        self.assertIn("Selected: 29.", edits[-1]["text"])
-        self.assertEqual(edits[-1]["reply_markup"]["inline_keyboard"][1][0]["text"], "Title chan001")
+        await self.bot.on_button({**q, "data": "k:chan040"})  # one too many
         await self.bot.on_button({**q, "data": "K"})
-        self.assertEqual(len(self.store.subs_of(ME)), 29)
+        self.assertEqual(self.api.calls[-1], ("answerCallbackQuery", {"callback_query_id": "q", "text": "Selected 31, but only 30 more fit. Untick 1."}))
+        self.assertEqual(len(self.store.subs_of(ME)), 20)  # nothing added
+        await self.bot.on_button({**q, "data": "k:chan001"})
+        await self.bot.on_button({**q, "data": "K"})
+        self.assertEqual(len(self.store.subs_of(ME)), 50)
         edits = [p for m, p in self.api.calls if m == "editMessageText"]
         self.assertTrue(edits[-1]["text"].startswith("New posts from these channels will come here: “Title chan000”, “Title chan002”"))
         self.assertIsNone(edits[-1]["reply_markup"])
