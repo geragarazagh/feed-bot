@@ -1,7 +1,7 @@
 """Everything the bot says, in English (default), Russian and Ukrainian.
 
 Button and command names are Telegram's own strings (translations.telegram.org, the Android and
-iOS apps): Add Channel, Choose a Channel, Channels, Pause, Resume, Remove, Settings, Help,
+iOS apps): Add Channel, Channels, Pause, Resume, Remove, Settings, Help,
 Notifications, Language, On, Off, Back, Stop, Cancel. Telegram's Russian writes «Вы/Ваш» with a
 capital letter, its Ukrainian does not.
 """
@@ -30,21 +30,21 @@ T: dict[str, dict[str, str]] = {
         "en": (
             "Choose public channels, and their new posts will come here, each as a link with a preview. "
             "Tap a preview to open the post with comments. You don't need to join the channels.\n\n"
-            "Add Channel: pick it from your chats, send its @username or t.me link, or forward any of its posts. Several at once are fine.\n"
+            "Add Channel: send its @username or t.me link, or forward any of its posts. Several at once are fine.\n"
             "Channels: pause or remove any of them.\n\n"
             "The bot is free and keeps only your list of channels and your settings."
         ),
         "ru": (
             "Выберите публичные каналы, и их новые публикации будут приходить сюда, каждая — ссылкой с предпросмотром. "
             "Нажмите на предпросмотр, чтобы открыть публикацию с комментариями. Подписываться на каналы не нужно.\n\n"
-            "Добавить канал: выберите его среди Ваших чатов, пришлите его @username или ссылку t.me либо перешлите любую его публикацию. Можно сразу несколько.\n"
+            "Добавить канал: пришлите его @username или ссылку t.me либо перешлите любую его публикацию. Можно сразу несколько.\n"
             "Каналы: поставьте любой на паузу или удалите.\n\n"
             "Бот бесплатный и хранит только список Ваших каналов и Ваши настройки."
         ),
         "uk": (
             "Виберіть публічні канали, і їхні нові публікації надходитимуть сюди, кожна — посиланням із передоглядом. "
             "Натисніть на передогляд, щоб відкрити публікацію з коментарями. Підписуватися на канали не потрібно.\n\n"
-            "Додати канал: виберіть його серед ваших чатів, надішліть його @username чи посилання t.me або перешліть будь-яку його публікацію. Можна одразу кілька.\n"
+            "Додати канал: надішліть його @username чи посилання t.me або перешліть будь-яку його публікацію. Можна одразу кілька.\n"
             "Канали: поставте будь-який на паузу або видаліть.\n\n"
             "Бот безплатний і зберігає лише список ваших каналів і ваші налаштування."
         ),
@@ -54,7 +54,6 @@ T: dict[str, dict[str, str]] = {
     "cmd_settings": {"en": "Settings", "ru": "Настройки", "uk": "Налаштування"},
     "cmd_help": {"en": "Help", "ru": "Помощь", "uk": "Допомога"},
     # buttons ------------------------------------------------------------------------------------
-    "btn_choose": {"en": "Choose a Channel", "ru": "Выбрать канал", "uk": "Виберіть канал"},
     "btn_pause": {"en": "Pause", "ru": "Пауза", "uk": "Пауза"},
     "btn_resume": {"en": "Resume", "ru": "Возобновить", "uk": "Продовжити"},
     "btn_remove": {"en": "Remove", "ru": "Удалить", "uk": "Видалити"},
@@ -71,23 +70,23 @@ T: dict[str, dict[str, str]] = {
         "en": (
             "Choose public channels, and their new posts will come here, each as a link with a preview. "
             "Tap a preview to open the post with comments.\n\n"
-            "Tap “Choose a Channel” below, send a channel's @username or t.me link, or forward any of its posts. Several at once are fine."
+            "Send a channel's @username or t.me link, or forward any of its posts. Several at once are fine."
         ),
         "ru": (
             "Выберите публичные каналы, и их новые публикации будут приходить сюда, каждая — ссылкой с предпросмотром. "
             "Нажмите на предпросмотр, чтобы открыть публикацию с комментариями.\n\n"
-            "Нажмите «Выбрать канал» внизу, пришлите @username канала или ссылку t.me либо перешлите любую его публикацию. Можно сразу несколько."
+            "Пришлите @username канала или ссылку t.me либо перешлите любую его публикацию. Можно сразу несколько."
         ),
         "uk": (
             "Виберіть публічні канали, і їхні нові публікації надходитимуть сюди, кожна — посиланням із передоглядом. "
             "Натисніть на передогляд, щоб відкрити публікацію з коментарями.\n\n"
-            "Натисніть «Виберіть канал» унизу, надішліть @username каналу чи посилання t.me або перешліть будь-яку його публікацію. Можна одразу кілька."
+            "Надішліть @username каналу чи посилання t.me або перешліть будь-яку його публікацію. Можна одразу кілька."
         ),
     },
     "add_prompt": {
-        "en": "Tap “Choose a Channel” below, send a channel's @username or t.me link (several at once are fine), or forward any of its posts.",
-        "ru": "Нажмите «Выбрать канал» внизу, пришлите @username канала или ссылку t.me (можно несколько сразу) либо перешлите любую его публикацию.",
-        "uk": "Натисніть «Виберіть канал» унизу, надішліть @username каналу чи посилання t.me (можна кілька одразу) або перешліть будь-яку його публікацію.",
+        "en": "Send a channel's @username or t.me link (several at once are fine), or forward any of its posts.",
+        "ru": "Пришлите @username канала или ссылку t.me (можно несколько сразу) либо перешлите любую его публикацию.",
+        "uk": "Надішліть @username каналу чи посилання t.me (можна кілька одразу) або перешліть будь-яку його публікацію.",
     },
     "help": {
         "en": (

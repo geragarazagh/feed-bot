@@ -20,30 +20,10 @@ from .web import NotReadable, WebView
 
 log = logging.getLogger("tgfeed.bot")
 
-REQUEST_CHANNEL = 1  # request_id of the "Choose a Channel" button
 NO_PREVIEW = {"is_disabled": True}
 COMMANDS = ("add", "channels", "settings", "help")
 RATE = object()  # _check's "too many checks this hour"
 LIST_MAX = 50  # channels checked from one list: the checklist stays under Telegram's 100 buttons
-
-
-def choose_keyboard(lang: str) -> dict:
-    """The reply keyboard under the input field: one button that opens Telegram's channel picker."""
-    return {
-        "keyboard": [[{
-            "text": t("btn_choose", lang),
-            "style": "primary",
-            "request_chat": {
-                "request_id": REQUEST_CHANNEL,
-                "chat_is_channel": True,
-                "chat_has_username": True,
-                "request_title": True,
-                "request_username": True,
-            },
-        }]],
-        "resize_keyboard": True,
-        "is_persistent": True,
-    }
 
 
 class Bot:
@@ -140,6 +120,7 @@ class Bot:
         user = self.store.touch_user(msg["from"]["id"], lang_of(msg["from"].get("language_code")))
         chat = msg["chat"]["id"]
 
+        # A pick from the old "Choose a Channel" keyboard (removed 2026-11-18), pressed before it was swept away.
         shared = msg.get("chat_shared")
         if shared:
             username = shared.get("username")
@@ -175,7 +156,7 @@ class Bot:
         if names or bad:
             await self.add(chat, user, names, bad)
         else:
-            await self.say(chat, t("add_prompt", user.lang), reply_markup=choose_keyboard(user.lang))
+            await self.say(chat, t("add_prompt", user.lang))
 
     async def command(self, chat: int, user: User, command: str, rest: str) -> None:
         if command == "start":
@@ -191,7 +172,7 @@ class Bot:
             if names or bad:
                 await self.add(chat, user, names, bad)
             else:
-                await self.say(chat, t("add_prompt", user.lang), reply_markup=choose_keyboard(user.lang))
+                await self.say(chat, t("add_prompt", user.lang))
         elif command == "channels":
             await self.show_channels(chat, user)
         elif command == "settings":
@@ -210,10 +191,13 @@ class Bot:
             await self.say(chat, t("help", user.lang, max=self.cfg.max_subs_per_user))
 
     async def start(self, chat: int, user: User) -> None:
-        await self.say(chat, t("start", user.lang), reply_markup=choose_keyboard(user.lang))
+        await self.say(chat, t("start", user.lang))
 
     async def say(self, chat: int, text: str, **params) -> dict:
-        return await self.api.call("sendMessage", chat_id=chat, text=text, link_preview_options=NO_PREVIEW, **params)
+        params = self.sender.sweep(chat, {"text": text, "link_preview_options": NO_PREVIEW, **params})
+        result = await self.api.call("sendMessage", chat_id=chat, **params)
+        self.sender.swept(chat, params)
+        return result
 
     # adding ---------------------------------------------------------------------------------
     def _rate_ok(self, user_id: int) -> bool:

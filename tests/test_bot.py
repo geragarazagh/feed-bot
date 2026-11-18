@@ -76,12 +76,28 @@ class BotTest(unittest.IsolatedAsyncioTestCase):
         m.update(extra)
         return m
 
-    async def test_start_shows_picker_in_users_language(self):
+    async def test_start_shows_no_keyboard_and_sweeps_the_old_one_once(self):
         await self.bot.on_message(self.msg("/start", lang="uk"))
-        sent = self.api.sent()[-1]
-        button = sent["reply_markup"]["keyboard"][0][0]
-        self.assertEqual(button["text"], "Виберіть канал")
-        self.assertTrue(button["request_chat"]["chat_is_channel"])
+        first = self.api.sent()[-1]
+        self.assertTrue(first["text"].startswith("Виберіть публічні канали"))
+        self.assertEqual(first["reply_markup"], {"remove_keyboard": True})  # the pre-2026-11-18 button goes
+        await self.bot.on_message(self.msg("/add", lang="uk"))
+        second = self.api.sent()[-1]
+        self.assertNotIn("reply_markup", second)
+        self.assertNotIn("keyboard", repr(self.api.calls).replace("inline_keyboard", "").replace("remove_keyboard", ""))
+
+    async def test_first_post_card_sweeps_the_old_keyboard(self):
+        self.sender.post(ME, "https://t.me/durov/600", False)
+        self.sender.post(ME, "https://t.me/durov/601", False)
+        task = asyncio.create_task(self.sender.run())
+        for _ in range(100):
+            if len(self.api.sent()) == 2:
+                break
+            await asyncio.sleep(0.05)
+        task.cancel()
+        first, second = self.api.sent()
+        self.assertEqual(first["reply_markup"], {"remove_keyboard": True})
+        self.assertNotIn("reply_markup", second)
 
     async def test_add_sends_latest_post_card_then_one_line(self):
         await self.bot.on_message(self.msg("@durov"))

@@ -64,6 +64,20 @@ class Sender:
         self._seq = itertools.count()
         self._next_for: dict[int, float] = {}
         self._wake = asyncio.Event()
+        # Chats whose old reply keyboard is gone. Until 2026-11-18 /start left a standing "Choose a Channel"
+        # button under the input field; a keyboard leaves only with a message that carries remove_keyboard,
+        # so the first plain message to each chat after a start carries it (invisible, harmless if repeated).
+        self._swept: set[int] = set()
+
+    def sweep(self, chat_id: int, params: dict) -> dict:
+        """Add remove_keyboard to a message without buttons, once per chat per process."""
+        if chat_id in self._swept or "reply_markup" in params:
+            return params
+        return {**params, "reply_markup": {"remove_keyboard": True}}
+
+    def swept(self, chat_id: int, params: dict) -> None:
+        if params.get("reply_markup") == {"remove_keyboard": True}:
+            self._swept.add(chat_id)
 
     def post(self, chat_id: int, link: str, silent: bool) -> None:
         self.put(chat_id, {**card(link), "disable_notification": silent or None}, is_post=True)
@@ -101,7 +115,9 @@ class Sender:
 
     async def _send(self, item: _Item) -> None:
         try:
-            await self.api.call("sendMessage", chat_id=item.chat_id, **item.params)
+            params = self.sweep(item.chat_id, item.params)
+            await self.api.call("sendMessage", chat_id=item.chat_id, **params)
+            self.swept(item.chat_id, params)
             if item.is_post:
                 self.store.count(sent=1)
                 self.status.last_delivery_at = time.time()

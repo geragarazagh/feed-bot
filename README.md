@@ -21,8 +21,8 @@ its comments. The channels need not be joined, and the bot reads them without a 
 
 ## Use
 
-- **Adding a channel.** The *Choose a Channel* button under the input field opens Telegram's own channel picker.
-  A channel can also be added by its `@username`, a `t.me` link, or any forwarded post. One channel is added at once:
+- **Adding a channel.** A channel is added by its `@username`, a `t.me` link, or any forwarded post; the bot shows
+  no keyboard under the input field, only the command menu. One channel is added at once:
   the bot answers with the channel's latest post as a card and one line. A message with several channels, or posts
   from several channels forwarded together, opens a checklist instead: one button per channel, all ticked; a tap
   toggles a channel, *Done* adds the ticked ones. Up to 50 channels of a list are checked and all readable ones are shown; as many are ticked as still fit (50 per user), and *Done* refuses a selection larger than the room left. A pasted list longer than 50 is checked
@@ -34,8 +34,9 @@ its comments. The channels need not be joined, and the bot reads them without a 
 Only public channels whose posts Telegram shows on the web (`t.me/s/<channel>`) can be read; for the few channels
 with that view off, the bot says so. A shared chat folder (`t.me/addlist/…`) cannot be used as a source: its web page
 shows only the folder's name and the number of chats, and the list itself is available only to a Telegram account.
-`KeyboardButtonRequestChat` selects one chat at a time (Bot API 10.4 has no multi-chat variant), which is why several
-channels at once go through text, forwards and the checklist.
+Telegram's own chat picker (`KeyboardButtonRequestChat`) is left out on purpose: it exists only as a reply-keyboard
+button, which stays under the input field (or behind a keyboard icon in it) until removed, and it selects one chat
+at a time.
 
 The bot explains itself once, on `/start`, and otherwise answers only what the user does; it sends no reminders.
 
