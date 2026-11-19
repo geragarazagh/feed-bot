@@ -1,7 +1,11 @@
 #!/bin/sh
 # Install or update the bot on a Debian/Ubuntu server. Run as root from the unpacked source:
 #   sudo sh deploy/install.sh
-# First install also needs /etc/feedbot/config.json and /etc/feedbot/token.cred (see README, "Install").
+# The first install also needs, made as root before this script:
+#   /etc/feedbot/config.json   {"max_channels": 100, "ipv6_only": false, "status_bucket": ""}
+#                              (ipv6_only: true on a host with IPv6 but no IPv4 route; other settings: tgfeed/config.py)
+#   /etc/feedbot/token.cred    printf '%s' 'BOT_TOKEN' | systemd-creds encrypt --with-key=host+tpm2 --name=token - /etc/feedbot/token.cred
+#                              (--with-key=host on a machine without a TPM)
 set -eu
 SRC=$(cd "$(dirname "$0")/.." && pwd)
 
